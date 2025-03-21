@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include "agent.h"
 
-Agent *agent_new(char s,int x, int y){
+Agent *agent_new(char s, int x, int y){
     Agent *a = NULL;
     a = malloc(sizeof(Agent));
     a->x = x;
@@ -19,17 +19,30 @@ Agent *agent_new(char s,int x, int y){
     return a;
 };
 
-void scan_neigh(Agent *a, Agent *g, int x, int y, int x_off, int y_off, int x_end_off, int y_end_off){
-    for(int i = y + y_off; y <= y + y_end_off;y++){
-        Agent *row = g+i;
-        for(int j = x + x_off; x <= x + x_end_off; x++){
-            if(!(i == y && j == x)){
-                Agent *ca = row+j; 
-                if(ca->style =='e'){
+void swap(Agent *a, Agent *b){
+    Agent *temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void cpy_ary(int dim, Agent **grid, Agent c[dim][dim]){
+    for(int i = 0; i < dim; i++){
+        for(int j = 0; j < dim; j++){
+            c[i][j] = grid[i][j];
+        }
+    }
+}
+
+
+void scan_neigh(Agent *a, Agent **g, int x, int y, int x_off, int y_off, int x_end_off, int y_end_off){
+    for(int i = y + y_off; i <= y + y_end_off; i++){
+        for(int j = x + x_off; j <= x + x_end_off; j++){
+            if(!(i == y && j == x)){ 
+                if(g[i][j]->style =='e'){
                     a->neighbors++;
                     a->end_lines++;
                 }
-                else if(ca->style == 'n'){
+                else if(g[i][j]->style == 'n'){
                     a->neighbors++;
                     a->new_lines++;
                 }
@@ -39,7 +52,7 @@ void scan_neigh(Agent *a, Agent *g, int x, int y, int x_off, int y_off, int x_en
 }
 
 
-void count_neigh(Agent *a,int dim,Agent *g){
+void count_neigh(int dim, Agent *a, Agent **g){
     int y = a->y;
     int x = a->x;
     if(y == 0 && x == 0){
@@ -74,10 +87,23 @@ void count_neigh(Agent *a,int dim,Agent *g){
 
 double get_happiness(Agent *a){
     if(a->style == 'e'){
-        return a->end_lines / a->neighbors;    
+        return 1.0 *  a->end_lines / a->neighbors;    
     }
-    else{
-        return a->new_lines / a->neighbors;
+    else if(a->style == 'n'){
+        return 1.0 * a->new_lines / a->neighbors;
     }
 }
 
+void move(int dim, Agent *a, Agent **grid){
+    Agent temp[dim][dim];
+    cpy_ary(dim, grid, temp);
+    for(int i = 0; i < dim; i++){
+        for(int j = 0; j < dim; j++) {
+            if(temp[i][j]->style == '.'){
+                swap(&a,&grid[i][j]);
+                temp[i][j] = agent_new('n',j,i);
+            }
+        }
+    }
+
+}

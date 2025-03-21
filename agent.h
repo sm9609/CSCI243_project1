@@ -7,7 +7,7 @@
 #define AGENT_H
 
 #include <stdio.h>
-
+#include <string.h>
 typedef struct agent_s Agent;
 
 struct agent_s{
@@ -21,12 +21,17 @@ struct agent_s{
 
 Agent *agent_new(char s,int x,int y);
 
+
+void swap(Agent  **a, Agent **b);
+
+void cpy_ary(int dim, Agent **grid, Agent *c[dim][dim]);
+
 /// check the eight adjacent cells for their agents and add them to an array.
 /// @param a the current agent.
 /// @param s the simulation the agent is a part
-void count_neigh(Agent *a,int dim,Agent *g);
+void count_neigh(int dim,Agent *a,Agent **g);
 
-void scan_neigh(Agent *a,Agent *g,int x,int y,int x_off,int y_off,int x_end_off,int y_end_off);
+void scan_neigh(Agent *a,Agent **g,int x,int y,int x_off,int y_off,int x_end_off,int y_end_off);
 
 /// gets the percent average of the neighbors with the same style.
 /// @param a the current agent.
@@ -42,11 +47,8 @@ char get_style(Agent a);
 /// moves the agent to the first vacant cell in the provided simulation's grid.
 /// @param a the current agent.
 /// @param s the simulation the agent is a part of
-void move(Agent a);
+void move(int dim, Agent *a, Agent **grid);
 
-int get_x(Agent a);
-
-int get_y(Agent a);
 
 #endif // AGENT_H
 
